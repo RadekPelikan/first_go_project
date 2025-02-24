@@ -40,7 +40,5 @@ $ go run ./dist/main.go
 ### Create new migration
 
 ```bash
-$ migrate create -ext sql -dir migrations -seq <name>
+$ migrate create -ext sql -dir src/sql/migrations -seq <name>
 ```
-
-
