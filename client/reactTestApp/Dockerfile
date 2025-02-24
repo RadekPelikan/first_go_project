@@ -9,6 +9,7 @@ WORKDIR /app
 
 # Step 3: Copy the package.json and package-lock.json (or yarn.lock) files to install dependencies
 COPY package*.json ./
+COPY pnpm*.json ./
 
 # Step 4: Install dependencies
 RUN pnpm install
