@@ -1,13 +1,13 @@
 ﻿version: "2"
 sql:
   - engine: "mysql"
-    schema: "./migrations"
-    queries: "query.sql"
+    schema: "./src/sql/migrations"
+    queries: "./src/sql/query.sql"
     gen:
       go:
         emit_json_tags: true
         package: "repository"
-        out: "generated/repository"
+        out: "./src/go/_generated/repository"
         sql_package: "database/sql"
         overrides:
           - column: "*.id"

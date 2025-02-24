@@ -1,25 +1,15 @@
 ﻿package main
 
 import (
-	"FirstProject/generated/repository"
+	"FirstProject/src/go/_generated/repository"
+	"FirstProject/src/go/db"
 	"context"
-	"database/sql"
 	"encoding/json"
-	"flag"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net/http"
-	"os"
 )
-
-type DbParams struct {
-	username string
-	password string
-	host     string
-	port     string
-	database string
-}
 
 func handler(w http.ResponseWriter, r *http.Request, ctx context.Context, repo *repository.Queries) {
 	if len(r.URL.Path) <= 3 {
@@ -38,56 +28,9 @@ func handler(w http.ResponseWriter, r *http.Request, ctx context.Context, repo *
 	w.Write(usersJson)
 }
 
-func withDefault(value string, defaultValue string) string {
-	if value == "" {
-		return defaultValue
-	}
-	return value
-}
-
-func getDB(dbParams DbParams) *sql.DB {
-
-	dsn := fmt.Sprintf("%s@(%s:%s)/%s?parseTime=true",
-		dbParams.username,
-		dbParams.host,
-		dbParams.port,
-		dbParams.database,
-	)
-	fmt.Printf("dsn: %s\n", dsn)
-	conn, err := sql.Open("mysql", dsn)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Connected to DB")
-	return conn
-}
-
-func getDefaultDbParams() DbParams {
-	database_flag := flag.String("db", "", "Database name")
-
-	flag.Parse()
-	database := *database_flag
-	if database == "" {
-		database = os.Getenv("DB_DATABASE")
-	}
-
-	if database == "" {
-		log.Fatal("db flag or DB_DATABASE env is not set")
-		panic("Database name is empty")
-	}
-	dbParams := DbParams{
-		username: withDefault(os.Getenv("DB_USER"), "root"),
-		password: withDefault(os.Getenv("DB_PASS"), ""),
-		host:     withDefault(os.Getenv("DB_HOST"), "localhost"),
-		port:     withDefault(os.Getenv("DB_PORT"), "3306"),
-		database: database,
-	}
-	return dbParams
-}
-
 func main() {
 	ctx := context.Background()
-	conn := getDB(getDefaultDbParams())
+	conn := db.GetDB(db.GetDefaultDbParams())
 	defer conn.Close()
 
 	repo := repository.New(conn)
